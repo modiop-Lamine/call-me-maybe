@@ -1,0 +1,7 @@
+.venv
+.python-version
+
+# pycache # (special for Python)
+*/__pycache__/*
+# Don't ignore these
+!.gitignore
