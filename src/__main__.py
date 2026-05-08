@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+import os
 import numpy as np
 from llm_sdk.llm_sdk import Small_LLM_Model
 from pydantic import BaseModel
@@ -79,6 +80,33 @@ def initialize_parser():
     return parser
 
 
+def write_json(new_data, filename='data/output/function_calling_results.json'):
+    # 1. Sécurité : Créer les dossiers parents s'ils n'existent pas
+    # os.path.dirname récupère "data/output/", et makedirs le crée.
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    
+    # 2. Récupérer les données existantes OU créer une liste vide
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            try:
+                file_data = json.load(file)
+            except json.JSONDecodeError:
+                # Si le fichier existe mais est vide ou mal formaté, on repart de zéro
+                file_data = []
+    else:
+        # Si le fichier n'existe pas, on initialise une liste vide
+        file_data = []
+        
+    # 3. Ajouter les nouvelles données
+    # (J'ai remplacé file_data[0].append par file_data.append, qui est la norme 
+    # pour ajouter un élément à une liste JSON principale)
+    file_data.append(new_data)
+    
+    # 4. Écrire le tout dans le fichier (le mode 'w' crée le fichier s'il n'existe pas)
+    with open(filename, 'w') as file:
+        json.dump(file_data, file, indent=4)
+
+
 def generate_function_call():
     for item in input_data:
         user_query = item.get("prompt")
@@ -104,7 +132,7 @@ def generate_function_call():
             path = f'{{"prompt": "{user_query}", "name": "{func_name}", "parameters": {{'
             valid_paths.append(path)
 
-        print("Start generating answer...")
+        print("Generating answer...")
 
         while len(generated_tokens) < max_tokens:
 
@@ -145,8 +173,6 @@ def generate_function_call():
             new_text_piece = model.decode([next_token_id])
             generated_text += new_text_piece
 
-            print(f" -> Token: '{repr(new_text_piece)}' (ID: {next_token_id})")
-
             if generated_text.count("{") > 0 and generated_text.count("{") == generated_text.count("}"):
                 print("\n>>> JSON fully generated.")
                 break
@@ -155,7 +181,7 @@ def generate_function_call():
             json_dict = json.loads(generated_text)
             final_output = FunctionCallOutput(**json_dict)
             print("\nPydantic validation successful.")
-            print(final_output.model_dump_json(indent=2))
+            write_json(final_output.model_dump())
         except Exception as e:
             print("\nValidation Error:", e)
 
