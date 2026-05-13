@@ -21,28 +21,24 @@ def load_json_file(filepath: str):
         sys.exit(1)
 
 
-def write_json(new_data, filename):
-    # 1. Sécurité : Créer les dossiers parents s'ils n'existent pas
-    # os.path.dirname récupère "data/output/", et makedirs le crée.
+def write_json(new_data: dict, filename: str):
+    # Create directory if they don't exist
     os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-    # 2. Récupérer les données existantes OU créer une liste vide
+    # Retrieve existing data or create an empty list
     if os.path.exists(filename):
         with open(filename, 'r') as file:
             try:
                 file_data = json.load(file)
             except json.JSONDecodeError:
-                # Si le fichier existe mais est vide ou mal formaté, on repart de zéro
-                file_data = []
+                # If there is a problem with the file with reset data
+                file_data = list()
     else:
-        # Si le fichier n'existe pas, on initialise une liste vide
-        file_data = []
+        # If the file doesn't exist we start empty
+        file_data = list()
 
-    # 3. Ajouter les nouvelles données
-    # (J'ai remplacé file_data[0].append par file_data.append, qui est la norme 
-    # pour ajouter un élément à une liste JSON principale)
     file_data.append(new_data)
 
-    # 4. Écrire le tout dans le fichier (le mode 'w' crée le fichier s'il n'existe pas)
+    # Write in the file ('w' create the file if it doesn't exist)
     with open(filename, 'w') as file:
         json.dump(file_data, file, indent=4)
