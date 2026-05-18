@@ -2,3 +2,4 @@
 
 exclude =
     llm_sdk/
+    .venv/

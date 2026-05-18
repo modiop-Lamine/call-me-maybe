@@ -67,7 +67,7 @@ install:
 
 run:
 	@printf "${BLUE}{make} ==> Running the main program...${NC}\n"
-	@${PYTHON} ${NAME} ${ARG}
+	@uv run python -m src
 
 debug:
 	@printf "${CYAN}{make} ==> Running the main file in debug mode (using ${DEBUGGER})...${NC}\n"
@@ -80,7 +80,7 @@ clean:
 
 lint:
 	@printf "${YELLOW}{make} ==> Checking norm of the project...${NC}\n"
-	@$(PYTHON) -m flake8 .
+	@python3 -m flake8 .
 	@mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 	@printf "${GREEN}{make} ==> Norm checking done. Everything is fine :)${NC}\n"
 

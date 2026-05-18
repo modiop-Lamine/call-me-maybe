@@ -1,7 +1,11 @@
 import argparse
 
 
-def initialize_parser():
+def initialize_parser() -> argparse.ArgumentParser:
+    """Initialize the parser of the program call.
+
+    Returns: The parsed argurment if there is any or the default arguments.
+    """
     parser = argparse.ArgumentParser(description="Tools for Function Calling "
                                      "with Qwen3-0.6B")
 

@@ -8,6 +8,15 @@ from FunctionCallOutput import FunctionCallOutput
 
 
 def build_system_prompt(user_query: str, functions_list: list) -> str:
+    """Create a prompt to set the goal and basic constraints to the LLM
+
+    Args:
+        user_query: The prompt of the user
+        functions_list: The extracted definitions
+            of the functions from the JSON
+
+    Returns: The prompt with the two arguments inside.
+    """
     functions_str = json.dumps(functions_list, indent=2)
 
     system_prompt = "You are a smart AI that translates human requests into "
@@ -33,7 +42,17 @@ def build_system_prompt(user_query: str, functions_list: list) -> str:
 def generate_function_call(
         functions_data: Any, input_data: Any, args: Namespace,
         model: Small_LLM_Model, id_to_token: dict
-):
+) -> None:
+    """Constrained coding so the IA select the right functions
+    and extract the right parameters
+
+    Args:
+        functions_data: All the functions informations
+        input_data: The json prompt file path
+        args: The arg object that hold all the arguments
+        model: The LLM
+        id_to_token: A dict with every token and their values in int
+    """
     for item in input_data:
         user_query = item.get("prompt")
         print("\n======================================")
@@ -46,12 +65,12 @@ def generate_function_call(
         input_ids = model.encode(full_prompt)[0].tolist()
 
         # Prepare a storage for the answer and put a limit of tokens
-        generated_tokens = []
-        generated_text = ""
+        generated_tokens: list[int] = list()
+        generated_text = str()
         max_tokens = 50
 
         # The strings we want the LLM to write
-        valid_paths = []
+        valid_paths = list()
         for func in functions_data:
             func_name = func["name"]
             # We make sure the IA build the text correctly

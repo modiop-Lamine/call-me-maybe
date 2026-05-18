@@ -1,9 +1,17 @@
 import sys
 import json
 import os
+from typing import Any
 
 
-def load_json_file(filepath: str):
+def load_json_file(filepath: str) -> Any:
+    """Load the json file or quit the program if an error occur.
+
+    Args:
+        filepath: The filepath of the file
+
+    Returns: The loaded data.
+    """
     try:
         with open(filepath, 'r') as file:
             return json.load(file)
@@ -21,7 +29,13 @@ def load_json_file(filepath: str):
         sys.exit(1)
 
 
-def write_json(new_data: dict, filename: str):
+def write_json(new_data: dict, filename: str) -> None:
+    """Write the new_data to the file
+
+    Args:
+        new_data: The data to add at the end of the file
+        filename: The path of the file
+    """
     # Create directory if they don't exist
     os.makedirs(os.path.dirname(filename), exist_ok=True)
 
