@@ -7,7 +7,7 @@ from json_func import write_json
 from FunctionCallOutput import FunctionCallOutput
 
 
-def build_system_prompt(user_query: str, functions_list: list) -> str:
+def build_system_prompt(user_query: str, functions_list: Any) -> str:
     """Create a prompt to set the goal and basic constraints to the LLM
 
     Args:
@@ -41,7 +41,7 @@ def build_system_prompt(user_query: str, functions_list: list) -> str:
 
 def generate_function_call(
         functions_data: Any, input_data: Any, args: Namespace,
-        model: Small_LLM_Model, id_to_token: dict
+        model: Small_LLM_Model, id_to_token: dict[str, int]
 ) -> None:
     """Constrained coding so the IA select the right functions
     and extract the right parameters

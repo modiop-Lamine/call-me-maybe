@@ -29,7 +29,7 @@ def load_json_file(filepath: str) -> Any:
         sys.exit(1)
 
 
-def write_json(new_data: dict, filename: str) -> None:
+def write_json(new_data: str, filename: str) -> None:
     """Write the new_data to the file
 
     Args:

@@ -46,52 +46,46 @@ help:
 
 # ══════════════════ VARIABLES ══════════════════
 
-VENV	:= call_me_maybe_venv
-PYTHON	:= ${VENV}/bin/python3
-PIP		:= ${VENV}/bin/pip
-NAME	:= call_me_maybe.py
-ARG		?= arg_makefile
+UV			:= uv
+PYTHON		:= python3
+NAME		:= src
+DEBUGGER	:= pdb
+ARG			?=
 
 
 
 # ══════════════════ RULES ══════════════════
 
 install:
-	@printf "${BLUE}{make} ==> Creating virtual environement...${NC}\n"
-	@python3 -m venv ${VENV}
-	@printf "${YELLOW}{make} ==> ${VENV} successfuly created!${NC}\n"
-	@printf "${BLUE}{make} ==> Installing required dependencies...${NC}\n"
-	@${PYTHON} -m pip install --upgrade pip
-	@${PIP} install -r requirements.txt
+	@printf "${BLUE}{make} ==> Creating virtual environement and syncing packages...${NC}\n"
+	@${UV} sync
 	@printf "${YELLOW}{make} ==> Installation done.${NC}\n"
 
 run:
 	@printf "${BLUE}{make} ==> Running the main program...${NC}\n"
-	@uv run python -m src
+	${UV} run ${PYTHON} -m ${NAME} ${ARG}
 
 debug:
 	@printf "${CYAN}{make} ==> Running the main file in debug mode (using ${DEBUGGER})...${NC}\n"
-	@$(PYTHON) -m $(DEBUGGER) $(NAME) $(CONFIG)
+	@${UV} run ${PYTHON} -m ${DEBUGGER} ${NAME} ${ARG}
 
 clean:
 	@find . -name "__pycache__" -type d -exec rm -rf {} +
 	@find . -name ".mypy_cache" -type d -exec rm -rf {} +
-	@printf "${PURPLE}{make} ==> Cleaned temporary files and caches${NC}\n"
+	@find . -name ".venv" -type d -exec rm -rf {} +
+	@printf "${PURPLE}{make} ==> Cleaned temporary virtual environement and caches${NC}\n"
 
 lint:
 	@printf "${YELLOW}{make} ==> Checking norm of the project...${NC}\n"
-	@python3 -m flake8 .
+	@${PYTHON} -m flake8 .
 	@mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 	@printf "${GREEN}{make} ==> Norm checking done. Everything is fine :)${NC}\n"
 
 lint-strict:
 	@printf "${YELLOW}{make} ==> Checking strict norm of the project...${NC}\n"
-	@$(PYTHON) -m flake8 .
+	@${PYTHON} -m flake8 .
 	@mypy . --strict
 	@printf "${GREEN}{make} ==> Strict norm checking done. Everything is fine :)${NC}\n"
-	
-
-
 
 
 .PHONY: install run debug clean lint lint-strict
