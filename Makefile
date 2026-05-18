@@ -35,10 +35,10 @@ help:
 	@printf "\n${BOLD}${PURPLE}>> CALL ME MAYBE'S MAKEFILE ${NC}\n\n"
 	@printf "${CYAN}Usage:${NC} make <target>\n\n"
 	@printf "${YELLOW}Available commands :${NC}\n"
-	@printf "  ${GREEN}install${NC}       Create a virtual environement and install required dependencies\n"
-	@printf "  ${GREEN}run${NC}           Run the main program (takes an ARG and an OPTION)\n"
+	@printf "  ${GREEN}install${NC}       Create a virtual environement and sync required dependencies\n"
+	@printf "  ${GREEN}run${NC}           Run the main program (can take an ARG)\n"
 	@printf "  ${GREEN}debug${NC}         Run the main file in debug mode\n"
-	@printf "  ${GREEN}clean${NC}         Clean temporary files and caches\n"
+	@printf "  ${GREEN}clean${NC}         Clean virtual environement and caches\n"
 	@printf "  ${GREEN}lint${NC}          Check project's norm (flake8 & mypy)\n"
 	@printf "  ${GREEN}lint-strict${NC}   A strict norm check\n"
 
@@ -88,4 +88,4 @@ lint-strict:
 	@printf "${GREEN}{make} ==> Strict norm checking done. Everything is fine :)${NC}\n"
 
 
-.PHONY: install run debug clean lint lint-strict
+.PHONY: help install run debug clean lint lint-strict
