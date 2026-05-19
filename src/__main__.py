@@ -1,8 +1,8 @@
 import json
 from llm_sdk.llm_sdk import Small_LLM_Model
-from json_func import load_json_file
-from parser import initialize_parser
-from llm_func import generate_function_call
+from .json_func import load_json_file
+from .parser import initialize_parser
+from .llm_func import generate_function_call
 
 
 # Initialize parser
@@ -13,7 +13,7 @@ args = parser.parse_args()
 
 # Load data
 print("Loading files...")
-functions_data = load_json_file(args.function_definition)
+functions_data = load_json_file(args.functions_definition)
 input_data = load_json_file(args.input)
 
 print("Files succesfully loaded!")

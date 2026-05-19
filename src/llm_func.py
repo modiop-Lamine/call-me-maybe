@@ -3,8 +3,8 @@ import numpy as np
 from typing import Any
 from argparse import Namespace
 from llm_sdk.llm_sdk import Small_LLM_Model
-from json_func import write_json
-from FunctionCallOutput import FunctionCallOutput
+from .json_func import write_json
+from .FunctionCallOutput import FunctionCallOutput
 
 
 def build_system_prompt(user_query: str, functions_list: Any) -> str:

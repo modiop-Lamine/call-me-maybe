@@ -10,9 +10,9 @@ def initialize_parser() -> argparse.ArgumentParser:
                                      "with Qwen3-0.6B")
 
     parser.add_argument(
-        "--function-definition",
+        "--functions-definition",
         type=str,
-        default="data/input/function_definitions.json",
+        default="data/input/functions_definition.json",
         help="Path to the file with function definitions"
     )
     parser.add_argument(

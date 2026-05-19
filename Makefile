@@ -63,7 +63,7 @@ install:
 
 run:
 	@printf "${BLUE}{make} ==> Running the main program...${NC}\n"
-	${UV} run ${PYTHON} -m ${NAME} ${ARG}
+	@${UV} run ${PYTHON} -m ${NAME} ${ARG}
 
 debug:
 	@printf "${CYAN}{make} ==> Running the main file in debug mode (using ${DEBUGGER})...${NC}\n"
