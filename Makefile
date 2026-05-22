@@ -72,6 +72,7 @@ debug:
 clean:
 	@find . -name "__pycache__" -type d -exec rm -rf {} +
 	@find . -name ".mypy_cache" -type d -exec rm -rf {} +
+	@find . -name "output" -type d -exec rm -rf {} +
 	@find . -name ".venv" -type d -exec rm -rf {} +
 	@printf "${PURPLE}{make} ==> Cleaned temporary virtual environement and caches${NC}\n"
 

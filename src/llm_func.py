@@ -1,10 +1,14 @@
 import json
+import os
 import numpy as np
 from typing import Any
+
 from argparse import Namespace
 from llm_sdk.llm_sdk import Small_LLM_Model
-from .json_func import write_json
+
 from .FunctionCallOutput import FunctionCallOutput
+from .json_func import write_json, load_json_file
+from .parser import initialize_parser
 
 
 def build_system_prompt(user_query: str, functions_list: Any) -> str:
@@ -19,22 +23,20 @@ def build_system_prompt(user_query: str, functions_list: Any) -> str:
     """
     functions_str = json.dumps(functions_list, indent=2)
 
-    system_prompt = "You are a smart AI that translates human requests into "
-    "structured function calls.\n"
-    "Here is the list of available functions you can use, along with their "
-    "descriptions and parameters:\n\n"
-    f"{functions_str}\n\n"
-    f"The user's request is: \"{user_query}\"\n\n"
-    "If none of the functions match the user's request, use the function name "
-    "\"fn_not_found\".\n\n"
-    "You must respond ONLY with a JSON object. Do not add any explanation.\n"
-    "The JSON object must contain exactly these three keys:\n"
-    "- \"prompt\": the exact user request.\n"
-    "- \"name\": the exact name of the function chosen from the list above (or"
-    "\"fn_not_found\").\n"
-    "- \"parameters\": an object containing the required arguments (can be "
-    "empty if not found).\n\n"
-    "JSON Output:"
+    system_prompt = f"""<|im_start|>system
+- You are an assistant that translates human requests into
+ structured function calls.
+- If none of the functions match the user's request, use the function name
+ "fn_not_found".
+- Here is the list of available functions you can use, along with their
+ descriptions and parameters: {functions_str}
+- Your response must JSON format<|im_end|>
+<|im_start|>user
+{user_query}<|im_end|>
+<|im_start|>assistant
+<think>
+</think>
+"""
 
     return system_prompt
 
@@ -67,7 +69,10 @@ def generate_function_call(
         # Prepare a storage for the answer and put a limit of tokens
         generated_tokens: list[int] = list()
         generated_text = str()
-        max_tokens = 50
+        max_tokens = 50 + len(user_query)
+
+        # Make sure the " are properly escaped
+        user_query = user_query.replace('"', '\\"')
 
         # The strings we want the LLM to write
         valid_paths = list()
@@ -131,6 +136,7 @@ def generate_function_call(
                 and generated_text.count("{") == generated_text.count("}")
             ):
                 print("\n>>> JSON fully generated.")
+                print(generated_text)
                 break
 
         try:
@@ -143,3 +149,41 @@ def generate_function_call(
             write_json(final_output.model_dump(), args.output)
         except Exception as e:
             print(f"\n\033[91mValidation Error: {e}\033[0m")
+
+
+def main():
+    # Initialize parser
+    parser = initialize_parser()
+
+    # Read the options of the command in the terminal that launched the program
+    args = parser.parse_args()
+
+    if os.path.exists(args.output):
+        os.remove(args.output)
+        print("\n[Cleanup] Removed the precedent file of output: "
+              f"\n\t- {args.output}\n")
+
+    # Load data
+    print("Loading files...")
+    functions_data = load_json_file(args.functions_definition)
+    input_data = load_json_file(args.input)
+
+    print("Files succesfully loaded!")
+    print(f"-> {len(functions_data)} functions available.")
+    print(f"-> {len(input_data)} queries to process.\n")
+
+    # Loading the LLM
+    print("Loading Qwen3-0.6B in memory... (it may take some time)")
+    model = Small_LLM_Model()
+
+    # Load vocabulary of the model
+    with open(model.get_path_to_vocab_file(), 'r') as f:
+        vocab = json.load(f)
+
+    # Reverse the keys and value to search the dict by token
+    id_to_token = {v: k for k, v in vocab.items()}
+    print(f"Vocabulary loaded : {len(vocab)} tokens availables.")
+
+    generate_function_call(
+        functions_data, input_data, args, model, id_to_token
+    )
