@@ -1,7 +1,5 @@
 .venv
 .python-version
-llm_sdk/
-data/
 uv.lock
 
 # pycache # (special for Python)
